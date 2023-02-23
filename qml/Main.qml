@@ -16,18 +16,18 @@
 
 import QtQuick 2.9
 import QtQuick.Window 2.3
-import Ubuntu.Components 1.3
+import Ubuntu.Components 1.3 as Ubuntu
 import QtQuick.Controls.Suru 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import Qt.labs.settings 1.0
 import io.thp.pyotherside 1.4
 
-MainView {
+ApplicationWindow {
     id: root
     objectName: 'mainView'
-    applicationName: 'traininfo.jakub'
-    automaticOrientation: true
+    //applicationName: 'traininfo.jakub'
+    //automaticOrientation: true
     width: units.gu(45)
     height: units.gu(75)
     property real marginVal: units.gu(1)
@@ -43,12 +43,47 @@ MainView {
 
     Page {
         id: page
-        anchors.fill: parent
+        anchors.fill: parent        
 
-        header: PageHeader {
-            id: header
-            title: i18n.tr('Train info')
-        }
+        header: ToolBar {
+                RowLayout {
+                    anchors.fill: parent
+                    ToolButton {
+                        //text: qsTr("‹")
+                        text: qsTr(" ") // invisible for now
+                        onClicked: stack.pop()
+                    }
+                    Label {
+                        text: "Train info"
+                        elide: Label.ElideRight
+                        horizontalAlignment: Qt.AlignHCenter
+                        verticalAlignment: Qt.AlignVCenter
+                        Layout.fillWidth: true
+                    }
+                    ToolButton {
+                        text: qsTr("⋮")
+                        onClicked: optionsMenu.open()
+
+                        Menu {
+                            id: optionsMenu
+                            transformOrigin: Menu.TopRight
+                            x: parent.width - width
+                            y: parent.height
+
+                            MenuItem {
+                                text: "Map"
+                            }
+                            MenuItem {
+                                text: "Settings"
+                            }
+                            MenuItem {
+                                text: "About"
+                            }
+                        }
+                    }
+                }
+            }
+
         Label {
             anchors.top: PageHeader.bottom
             id: infoLabel
