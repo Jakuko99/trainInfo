@@ -1,0 +1,7 @@
+[Desktop Entry]
+_Name=Train info
+Exec=qmlscene %U qml/Main.qml
+Icon=assets/logo.jpg
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true

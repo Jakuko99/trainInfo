@@ -1,0 +1,15 @@
+{
+    "name": "traininfo.jakub",
+    "description": "A short description of your app",
+    "architecture": "@CLICK_ARCH@",
+    "title": "Train info",
+    "hooks": {
+        "traininfo": {
+            "apparmor": "traininfo.apparmor",
+            "desktop":  "traininfo.desktop"
+        }
+    },
+    "version": "@BUILD_VERSION@",
+    "maintainer": "Jakub Krsko <jakubkrs@outlook.sk>",
+    "framework" : "@CLICK_FRAMEWORK@"
+}
