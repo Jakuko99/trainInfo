@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.3
 import Qt.labs.settings 1.0
 import io.thp.pyotherside 1.4
 
+
 ApplicationWindow {
     id: root
     objectName: 'mainView'
@@ -41,51 +42,60 @@ ApplicationWindow {
 
     Component.onCompleted: clearFields() // remove placeholder text
 
+    StackView{
+        id: stack
+        initialItem: mainPage
+        anchors.fill: parent
+    }
+
     Page {
-        id: page
-        anchors.fill: parent        
+        id: mainPage
+        //anchors.fill: parent //maybe StackView sets fill for all pages
 
         header: ToolBar {
-                RowLayout {
-                    anchors.fill: parent
-                    ToolButton {
-                        //text: qsTr("‹")
-                        text: qsTr(" ") // invisible for now
-                        onClicked: stack.pop()
-                    }
-                    Label {
-                        text: "Train info"
-                        elide: Label.ElideRight
-                        horizontalAlignment: Qt.AlignHCenter
-                        verticalAlignment: Qt.AlignVCenter
-                        Layout.fillWidth: true
-                    }
-                    ToolButton {
-                        text: qsTr("⋮")
-                        onClicked: optionsMenu.open()
+            id: toolbar
+            RowLayout {
+                anchors.fill: parent
+                Label {
+                    //text: qsTr("‹")
+                    text: qsTr(" ") // invisible for now
+                    //onClicked: stack.pop()
+                }
+                Label {
+                    text: "Train info"
+                    elide: Label.ElideRight
+                    horizontalAlignment: Qt.AlignHCenter
+                    verticalAlignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
+                }
+                ToolButton {
+                    text: qsTr("⋮")
+                    onClicked: optionsMenu.open()
 
-                        Menu {
-                            id: optionsMenu
-                            transformOrigin: Menu.TopRight
-                            x: parent.width - width
-                            y: parent.height
+                    Menu {
+                        id: optionsMenu
+                        transformOrigin: Menu.TopRight
+                        x: parent.width - width
+                        y: parent.height
 
-                            MenuItem {
-                                text: "Map"
-                            }
-                            MenuItem {
-                                text: "Settings"
-                            }
-                            MenuItem {
-                                text: "About"
-                            }
+                        MenuItem {
+                            text: "All trains"
+                            onTriggered: stack.push(Qt.resolvedUrl("allTrains.qml"))
+                        }
+                        MenuItem {
+                            text: "Settings"
+                            onTriggered: settingsDialog.open()
+                        }
+                        MenuItem {
+                            text: "About"
                         }
                     }
                 }
             }
+        }
 
         Label {
-            anchors.top: PageHeader.bottom
+            anchors.top: parent.top
             id: infoLabel
             anchors.leftMargin: marginVal
             anchors.left: parent.left
@@ -96,6 +106,7 @@ ApplicationWindow {
 
         Row {
             anchors.leftMargin: marginVal
+            anchors.topMargin: marginVal
             anchors.top: infoLabel.bottom
             anchors.left: parent.left
             spacing: marginVal
@@ -110,7 +121,10 @@ ApplicationWindow {
             Button {
                 id: button
                 text: qsTr("Search")
-                onClicked: python.call("example.getData", [numberField.text], function(returnVal) {
+                onClicked: function(){
+                    clearFields()
+                    nameLabel.text = "Fetching train info..." //show that something is happening
+                    python.call("example.getData", [numberField.text], function(returnVal) {
                         const json_obj = JSON.parse(returnVal);
                         //console.log(returnVal)
                         if (json_obj["CisloVlaku"]){ // train found
@@ -129,7 +143,8 @@ ApplicationWindow {
                             providerLabel.text = "";
                         }
                     }
-             );
+                    );
+                }
             }
         }
 
@@ -140,13 +155,15 @@ ApplicationWindow {
             anchors.top: inputRow.bottom
             anchors.left: parent.left
             anchors.right: parent.right
+            spacing: 1
 
             Label {
                 id: nameLabel
+                wrapMode: Text.WordWrap
                 color: "#247cd7"
-                anchors.top: parent.top
-                anchors.left: parent.left                
                 anchors.leftMargin: marginVal
+                anchors.right: parent.right
+                anchors.left: parent.left
                 text: qsTr("Train info placeholder")
                 font.bold: true
 
@@ -156,38 +173,34 @@ ApplicationWindow {
                 id: trainDestLabel
                 text: qsTr("Destination placeholder")
                 wrapMode: Text.WordWrap
-                anchors.top: nameLabel.bottom
-                anchors.left: parent.left
-                anchors.leftMargin: marginVal
                 anchors.right: parent.right
+                anchors.leftMargin: marginVal
+                anchors.left: parent.left
             }
 
             Label {
                 id: positionLabel
+                anchors.right: parent.right
+                anchors.leftMargin: marginVal
+                anchors.left: parent.left
                 text: qsTr("Position placeholder")
                 wrapMode: Text.WordWrap
-                anchors.top: trainDestLabel.bottom
-                anchors.left: parent.left
-                anchors.leftMargin: marginVal
-                anchors.right: parent.right
                 font.bold: true
             }
 
             Label {
                 id: providerLabel
-                text: qsTr("Provider placeholder")
-                wrapMode: Text.WordWrap
-                anchors.top: positionLabel.bottom
+                anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.leftMargin: marginVal
-                anchors.right: parent.right
+                anchors.bottomMargin: marginVal
+                text: qsTr("Provider placeholder")
+                wrapMode: Text.WordWrap
             }
             Button {
-                anchors.top: providerLabel.bottom
-                anchors.topMargin: marginVal
+                text: qsTr("Clear")
                 anchors.right: parent.right
                 anchors.rightMargin: marginVal
-                text: qsTr("Clear")
                 onClicked: clearFields()
             }
         }
@@ -201,9 +214,78 @@ ApplicationWindow {
             addImportPath(Qt.resolvedUrl('../src/'));
             importModule('example', function() {
             });
-        }      
+        }
         onError: {
             console.log('python error: ' + traceback);
+        }
+    }
+
+    Dialog {
+        id: settingsDialog
+        x: Math.round((root.width - width) / 2)
+        y: (root.height - height) / 2 - header.height
+        width: Math.round(root.width / 3 * 2)
+        modal: true
+        focus: true
+        title: "Settings"
+
+        standardButtons: Dialog.Ok
+        onAccepted: {
+            settingsDialog.close()
+        }
+
+        contentItem: ColumnLayout {
+            id: settingsColumn
+            spacing: 5
+
+            Label{
+                id: helpLabel
+                text: "Filter options for train visibility:"
+            }
+            CheckBox{
+                id: passengerTrain
+                checked: true
+                text: "Os (passenger train)"
+            }
+            CheckBox{
+                id: fastTrain
+                checked: true
+                text: "R (fast train)"
+            }
+            CheckBox{
+                id: expressTrain
+                checked: true
+                text: "Ex (express train)"
+            }
+            CheckBox{
+                id: regionalExpressTrain
+                checked: true
+                text: "REX (regional express train)"
+            }
+            CheckBox{
+                id: manipulationTrain
+                text: "Mn (manipulation train)"
+            }
+            CheckBox{
+                id: freightExpressTrain
+                text: "Nex (freight express)"
+            }
+            CheckBox{
+                id: intermediateFreightTrain
+                text: "Pn (intermediate freight train)"
+            }
+            CheckBox{
+                id: locomotiveTrain
+                text: "Rv (locomotive train)"
+            }
+            CheckBox{
+                id: setTrain
+                text: "Sv (set of trains)"
+            }
+            CheckBox{
+                id: serviceTrain
+                text: "Sluz (service train)"
+            }
         }
     }
 }
