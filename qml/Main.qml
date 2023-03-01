@@ -88,6 +88,7 @@ ApplicationWindow {
                         }
                         MenuItem {
                             text: "About"
+                            onTriggered: stack.push(Qt.resolvedUrl("aboutPage.qml"))
                         }
                     }
                 }
