@@ -49,31 +49,33 @@ Page {
         anchors.topMargin: marginVal
         anchors.right: parent.right
         onClicked: function(){
-            contentTrainList.model.clear()
+            contentTrainList.model.clear() //remove old items
             progressLabel.text = "Fetching train info..." //show that something is happening
-            python.call("example.getAllData", function(returnVal) {
+            python.call("example.getAllData", [], function(returnVal) {
                 const json_obj = JSON.parse(returnVal);
-                console.log(returnVal)
                 progressLabel.text = "";
-                /*if (json_obj["CisloVlaku"]){ // train found
-                    if (json_obj["NazovVlaku"]){
-                        nameLabel.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku + " " + json_obj.NazovVlaku;
-                    } else {
-                        nameLabel.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku;
+                for(let i = 0; i < json_obj.length; i++) {
+                    let obj = json_obj[i];
+                    var trainName = "";
+                    if (obj["CisloVlaku"]){ // train found
+                        if (obj["NazovVlaku"]){
+                            trainName = obj.DruhVlakuKom.trim() + ' ' + obj.CisloVlaku + " " + obj.NazovVlaku;
+                        } else {
+                            trainName = obj.DruhVlakuKom.trim() + ' ' + obj.CisloVlaku;
+                        }
+                        var trainDest = obj.StanicaVychodzia + " (" + obj.CasVychodzia + ") -> " + obj.StanicaCielova + " (" + obj.CasCielova + ")";
+                        var position = "Position: " + obj.StanicaUdalosti + " " + obj.CasUdalosti + " Delay: " + obj.Meskanie + " min";
+                        var delayVal = obj.Meskanie;
+                        var provider = "Provider: " + obj.Dopravca;
+                        trainList.append({name: trainName, destination: trainDest, position:position, provider:provider})
                     }
-                    trainDestLabel.text = json_obj.StanicaVychodzia + " (" + json_obj.CasVychodzia + ") -> " + json_obj.StanicaCielova + " (" + json_obj.CasCielova + ")";
-                    positionLabel.text = "Position: " + json_obj.StanicaUdalosti + " " + json_obj.CasUdalosti + " Delay: " + json_obj.Meskanie + " min";
-                    providerLabel.text = "Provider: " + json_obj.Dopravca;
-                } else { // train not found
-                    nameLabel.text = "Train not found";
-                    trainDestLabel.text = "";
-                    positionLabel.text = "";
-                    providerLabel.text = "";
-                }*/
+                }
+
             }
             );
         }
     }
+
     Label{
         id: progressLabel
         text: ""
@@ -94,24 +96,32 @@ Page {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        contentHeight: contentColumn.height
+        //contentHeight: contentColumn.height
         ScrollBar.vertical: ScrollBar {
             width: 10
             anchors.right: parent.right // adjust the anchor as suggested by derM
             policy: ScrollBar.AlwaysOn
         }
 
-        Column{
-            id: contentColumn
-            anchors.left: parent.left
-            anchors.right: parent.right
-            ListView{
-                id: contentTrainList
-                flickableDirection: Flickable.AutoFlickDirection
-                model: ListModel{}
+        ListView{
+            id: contentTrainList
+            anchors.fill: parent
+            flickableDirection: Flickable.VerticalFlick
+            boundsBehavior: Flickable.StopAtBounds
+            model: ListModel{
+                id: trainList
+            }
 
-                delegate: Frame {
-                    Column {
+            delegate: Item {
+                width: parent.width
+                Frame {
+                    width: parent.width
+                    ColumnLayout {
+                        id: frameColumn
+                        Layout.fillWidth: true
+                        anchors.right: parent.right
+                        anchors.left: parent.left
+                        spacing: 0
                         Text {
                             id: trainName
                             text: name
@@ -126,12 +136,11 @@ Page {
                         }
                         Text {
                             id: positionInfo
-                            text: position + " " + delay
+                            text: position
                             wrapMode: Text.WordWrap
                             font.bold: true
                         }
-
-                        Label {
+                        Text {
                             id: providerInfo
                             text: provider
                             wrapMode: Text.WordWrap
@@ -141,9 +150,9 @@ Page {
             }
         }
     }
+
     Python {
         id: python
-
         Component.onCompleted: {
             addImportPath(Qt.resolvedUrl('../src/'));
             importModule('example', function() {
