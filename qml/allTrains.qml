@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.2
+import io.thp.pyotherside 1.4
 
 Page {
     id: allTrainsPage
@@ -47,16 +48,109 @@ Page {
         anchors.rightMargin: marginVal
         anchors.topMargin: marginVal
         anchors.right: parent.right
-        onClicked: testLabel.text = "not working yet"
+        onClicked: function(){
+            contentTrainList.model.clear()
+            progressLabel.text = "Fetching train info..." //show that something is happening
+            python.call("example.getAllData", function(returnVal) {
+                const json_obj = JSON.parse(returnVal);
+                console.log(returnVal)
+                progressLabel.text = "";
+                /*if (json_obj["CisloVlaku"]){ // train found
+                    if (json_obj["NazovVlaku"]){
+                        nameLabel.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku + " " + json_obj.NazovVlaku;
+                    } else {
+                        nameLabel.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku;
+                    }
+                    trainDestLabel.text = json_obj.StanicaVychodzia + " (" + json_obj.CasVychodzia + ") -> " + json_obj.StanicaCielova + " (" + json_obj.CasCielova + ")";
+                    positionLabel.text = "Position: " + json_obj.StanicaUdalosti + " " + json_obj.CasUdalosti + " Delay: " + json_obj.Meskanie + " min";
+                    providerLabel.text = "Provider: " + json_obj.Dopravca;
+                } else { // train not found
+                    nameLabel.text = "Train not found";
+                    trainDestLabel.text = "";
+                    positionLabel.text = "";
+                    providerLabel.text = "";
+                }*/
+            }
+            );
+        }
     }
     Label{
-        id: testLabel
+        id: progressLabel
         text: ""
-        anchors.left: parent.left
         anchors.top: fetchButton.bottom
+        anchors.right: parent.right
+        anchors.left: parent.left
         anchors.leftMargin: marginVal
         anchors.rightMargin: marginVal
+    }
+
+    Flickable {
+        id: contentFlickable
+        flickableDirection: Flickable.VerticalFlick
+        anchors.top: fetchButton.bottom
         anchors.topMargin: marginVal
+        anchors.rightMargin: marginVal
+        anchors.leftMargin: marginVal
         anchors.right: parent.right
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        contentHeight: contentColumn.height
+        ScrollBar.vertical: ScrollBar {
+            width: 10
+            anchors.right: parent.right // adjust the anchor as suggested by derM
+            policy: ScrollBar.AlwaysOn
+        }
+
+        Column{
+            id: contentColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            ListView{
+                id: contentTrainList
+                flickableDirection: Flickable.AutoFlickDirection
+                model: ListModel{}
+
+                delegate: Frame {
+                    Column {
+                        Text {
+                            id: trainName
+                            text: name
+                            wrapMode: Text.WordWrap
+                            color: "#247cd7"
+                            font.bold: true
+                        }
+                        Text {
+                            id: trainDestInfo
+                            text: destination
+                            wrapMode: Text.WordWrap
+                        }
+                        Text {
+                            id: positionInfo
+                            text: position + " " + delay
+                            wrapMode: Text.WordWrap
+                            font.bold: true
+                        }
+
+                        Label {
+                            id: providerInfo
+                            text: provider
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Python {
+        id: python
+
+        Component.onCompleted: {
+            addImportPath(Qt.resolvedUrl('../src/'));
+            importModule('example', function() {
+            });
+        }
+        onError: {
+            console.log('python error: ' + traceback);
+        }
     }
 }

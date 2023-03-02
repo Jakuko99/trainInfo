@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: traininfo.jakub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-01 23:08+0100\n"
+"POT-Creation-Date: 2023-03-02 19:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../qml/aboutPage.qml:80 traininfo.desktop.in.h:1
+#: ../qml/aboutPage.qml:69 traininfo.desktop.in.h:1
 msgid "Train info"
 msgstr ""
 
-#: ../qml/aboutPage.qml:88
+#: ../qml/aboutPage.qml:80
 msgid "Version %1"
 msgstr ""

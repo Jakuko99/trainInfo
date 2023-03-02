@@ -37,3 +37,10 @@ def getData(number:int = None):
              #   print(vlak.get('StanicaVychodzia'), "("+ vlak.get('CasVychodzia')+ ")", "->", vlak.get('StanicaCielova') , "(" + vlak.get('CasCielova') + ")")
              #   print("Poloha:", vlak.get('StanicaUdalosti'), vlak.get('CasUdalosti') ,"Meskanie:", vlak.get('Meskanie'), "min")
               #  print("Dopravca:", vlak.get('Dopravca'))        
+
+def getAllData():
+    request = Request("GET", "https://tis.zsr.sk/mapavlakov/api/osobne").prepare()
+    s = Session()
+    response = s.send(request)
+    response_obj = json.loads(response.text)
+    return json.dumps(response_obj)
