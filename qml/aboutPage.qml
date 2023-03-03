@@ -17,13 +17,13 @@ Page {
                 onClicked: stack.pop()
             }
             Label {
-                text: "All trains"
-                elide: Label.ElideRight
+                text: "About"
+                elide: Label.ElideRight                
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true
             }
-            Label {
+            ToolButton {
                 //text: qsTr("⋮")
                 text: qsTr(" ")
                 //onClicked: optionsMenu.open()

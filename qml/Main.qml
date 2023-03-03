@@ -56,7 +56,7 @@ ApplicationWindow {
             id: toolbar
             RowLayout {
                 anchors.fill: parent
-                Label {
+                ToolButton{
                     //text: qsTr("‹")
                     text: qsTr(" ") // invisible for now
                     //onClicked: stack.pop()
@@ -84,7 +84,7 @@ ApplicationWindow {
                         }
                         MenuItem {
                             text: "Settings"
-                            onTriggered: settingsDialog.open()
+                            onTriggered: stack.push(Qt.resolvedUrl("settingsPage.qml"))
                         }
                         MenuItem {
                             text: "About"
@@ -219,74 +219,5 @@ ApplicationWindow {
         onError: {
             console.log('python error: ' + traceback);
         }
-    }
-
-    Dialog {
-        id: settingsDialog
-        x: Math.round((root.width - width) / 2)
-        y: (root.height - height) / 2 - header.height
-        width: Math.round(root.width / 3 * 2)
-        modal: true
-        focus: true
-        title: "Settings"
-
-        standardButtons: Dialog.Ok
-        onAccepted: {
-            settingsDialog.close()
-        }
-
-        contentItem: ColumnLayout {
-            id: settingsColumn
-            spacing: 5
-
-            Label{
-                id: helpLabel
-                text: "Filter options for train visibility:"
-            }
-            CheckBox{
-                id: passengerTrain
-                checked: true
-                text: "Os (passenger train)"
-            }
-            CheckBox{
-                id: fastTrain
-                checked: true
-                text: "R (fast train)"
-            }
-            CheckBox{
-                id: expressTrain
-                checked: true
-                text: "Ex (express train)"
-            }
-            CheckBox{
-                id: regionalExpressTrain
-                checked: true
-                text: "REX (regional express train)"
-            }
-            CheckBox{
-                id: manipulationTrain
-                text: "Mn (manipulation train)"
-            }
-            CheckBox{
-                id: freightExpressTrain
-                text: "Nex (freight express)"
-            }
-            CheckBox{
-                id: intermediateFreightTrain
-                text: "Pn (intermediate freight train)"
-            }
-            CheckBox{
-                id: locomotiveTrain
-                text: "Rv (locomotive train)"
-            }
-            CheckBox{
-                id: setTrain
-                text: "Sv (set of trains)"
-            }
-            CheckBox{
-                id: serviceTrain
-                text: "Sluz (service train)"
-            }
-        }
-    }
+    }   
 }

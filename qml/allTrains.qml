@@ -22,13 +22,29 @@ Page {
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true
             }
-            Label {
-                //text: qsTr("⋮")
-                text: qsTr(" ")
-                //onClicked: optionsMenu.open()
+            ToolButton {
+                text: qsTr("⋮")
+                onClicked: optionsMenu.open()
+
+                Menu {
+                    id: optionsMenu
+                    transformOrigin: Menu.TopRight
+                    x: parent.width - width
+                    y: parent.height
+
+                    MenuItem {
+                        text: "Clear list"
+                        onTriggered: contentTrainList.model.clear()
+                    }
+                    MenuItem{
+                        text: 'Settings'
+                        onTriggered: settingsDialog.open()
+                    }
+                }
             }
         }
     }
+
     Label {
         id: infoLabel
         text: "Fetch information about all trains according to filter settings:"
@@ -66,7 +82,7 @@ Page {
                         var trainDestFrom = obj.StanicaVychodzia + " (" + obj.CasVychodzia + ") -> ";
                         var trainDestTo = obj.StanicaCielova + " (" + obj.CasCielova + ")";
                         var position = obj.StanicaUdalosti + " " + obj.CasUdalosti;
-                        var delay = "Delay: " + obj.Meskanie + " min";
+                        var delay = obj.Meskanie;
                         var delayVal = obj.Meskanie;
                         var provider = "Provider: " + obj.Dopravca;
                         trainList.append({name: trainName, destinationFrom: trainDestFrom, destinationTo: trainDestTo, position:position, delay: delay, provider:provider})
@@ -98,12 +114,6 @@ Page {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        //contentHeight: contentTrainList.height
-        /*ScrollBar.vertical: ScrollBar {
-            width: 10
-            anchors.right: parent.right // adjust the anchor as suggested by derM
-            policy: ScrollBar.AlwaysOn
-        }*/
 
         ListView{
             id: contentTrainList
@@ -111,13 +121,18 @@ Page {
             anchors.fill: parent
             flickableDirection: Flickable.VerticalFlick
             boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: ScrollBar {
+                width: 15
+                anchors.right: parent.right
+                policy: ScrollBar.AlwaysOn
+            }
             model: ListModel{
                 id: trainList
             }
 
             delegate: Item {
                 width: parent.width
-                height: contentFrame.height + 5
+                height: contentFrame.height + 10
                 Frame {
                     id: contentFrame
                     width: parent.width
@@ -152,11 +167,19 @@ Page {
                         }
                         Label{
                             id: delayInfo
-                            text: delay
+                            text: 'Delay: '+ delay + ' min'
+                            Component.onCompleted: function(){ //adjust color based on delay value
+                                if (delay < 5){
+                                    delayInfo.color = "green";
+                                } else if ((delay >= 5) && (delay < 20)){
+                                    delayInfo.color = "orange";
+                                } else {
+                                    delayInfo.color = "red";
+                                }
+                            }
                             wrapMode: Text.WordWrap
                             font.bold: true
                         }
-
                         Label {
                             id: providerInfo
                             text: provider
@@ -177,6 +200,74 @@ Page {
         }
         onError: {
             console.log('python error: ' + traceback);
+        }
+    }
+    Dialog {
+        id: settingsDialog
+        x: Math.round((root.width - width) / 2)
+        y: (root.height - height) / 2 - header.height
+        width: Math.round(root.width / 3 * 2)
+        modal: true
+        focus: true
+        title: "Settings"
+
+        standardButtons: Dialog.Ok
+        onAccepted: {
+            settingsDialog.close()
+        }
+
+        contentItem: ColumnLayout {
+            id: settingsColumn
+            spacing: 5
+
+            Label{
+                id: helpLabel
+                text: "Filter options for train visibility:"
+            }
+            CheckBox{
+                id: passengerTrain
+                checked: true
+                text: "Os (passenger train)"
+            }
+            CheckBox{
+                id: fastTrain
+                checked: true
+                text: "R (fast train)"
+            }
+            CheckBox{
+                id: expressTrain
+                checked: true
+                text: "Ex (express train)"
+            }
+            CheckBox{
+                id: regionalExpressTrain
+                checked: true
+                text: "REX (regional express train)"
+            }
+            CheckBox{
+                id: manipulationTrain
+                text: "Mn (manipulation train)"
+            }
+            CheckBox{
+                id: freightExpressTrain
+                text: "Nex (freight express)"
+            }
+            CheckBox{
+                id: intermediateFreightTrain
+                text: "Pn (intermediate freight train)"
+            }
+            CheckBox{
+                id: locomotiveTrain
+                text: "Rv (locomotive train)"
+            }
+            CheckBox{
+                id: setTrain
+                text: "Sv (set of trains)"
+            }
+            CheckBox{
+                id: serviceTrain
+                text: "Sluz (service train)"
+            }
         }
     }
 }
