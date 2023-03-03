@@ -63,11 +63,13 @@ Page {
                         } else {
                             trainName = obj.DruhVlakuKom.trim() + ' ' + obj.CisloVlaku;
                         }
-                        var trainDest = obj.StanicaVychodzia + " (" + obj.CasVychodzia + ") -> " + obj.StanicaCielova + " (" + obj.CasCielova + ")";
-                        var position = "Position: " + obj.StanicaUdalosti + " " + obj.CasUdalosti + " Delay: " + obj.Meskanie + " min";
+                        var trainDestFrom = obj.StanicaVychodzia + " (" + obj.CasVychodzia + ") -> ";
+                        var trainDestTo = obj.StanicaCielova + " (" + obj.CasCielova + ")";
+                        var position = obj.StanicaUdalosti + " " + obj.CasUdalosti;
+                        var delay = "Delay: " + obj.Meskanie + " min";
                         var delayVal = obj.Meskanie;
                         var provider = "Provider: " + obj.Dopravca;
-                        trainList.append({name: trainName, destination: trainDest, position:position, provider:provider})
+                        trainList.append({name: trainName, destinationFrom: trainDestFrom, destinationTo: trainDestTo, position:position, delay: delay, provider:provider})
                     }
                 }
 
@@ -96,15 +98,16 @@ Page {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        //contentHeight: contentColumn.height
-        ScrollBar.vertical: ScrollBar {
+        //contentHeight: contentTrainList.height
+        /*ScrollBar.vertical: ScrollBar {
             width: 10
             anchors.right: parent.right // adjust the anchor as suggested by derM
             policy: ScrollBar.AlwaysOn
-        }
+        }*/
 
         ListView{
             id: contentTrainList
+            clip: true
             anchors.fill: parent
             flickableDirection: Flickable.VerticalFlick
             boundsBehavior: Flickable.StopAtBounds
@@ -114,7 +117,9 @@ Page {
 
             delegate: Item {
                 width: parent.width
+                height: contentFrame.height + 5
                 Frame {
+                    id: contentFrame
                     width: parent.width
                     ColumnLayout {
                         id: frameColumn
@@ -122,25 +127,37 @@ Page {
                         anchors.right: parent.right
                         anchors.left: parent.left
                         spacing: 0
-                        Text {
+                        Label {
                             id: trainName
                             text: name
                             wrapMode: Text.WordWrap
                             color: "#247cd7"
                             font.bold: true
                         }
-                        Text {
+                        Label {
                             id: trainDestInfo
-                            text: destination
+                            text: destinationFrom
                             wrapMode: Text.WordWrap
                         }
-                        Text {
+                        Label {
+                            id: trainDestInfoCont
+                            text: destinationTo
+                            wrapMode: Text.WordWrap
+                        }
+                        Label {
                             id: positionInfo
                             text: position
                             wrapMode: Text.WordWrap
                             font.bold: true
                         }
-                        Text {
+                        Label{
+                            id: delayInfo
+                            text: delay
+                            wrapMode: Text.WordWrap
+                            font.bold: true
+                        }
+
+                        Label {
                             id: providerInfo
                             text: provider
                             wrapMode: Text.WordWrap
