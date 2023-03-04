@@ -40,7 +40,12 @@ ApplicationWindow {
         providerLabel.text = "";
     }
 
-    Component.onCompleted: clearFields() // remove placeholder text
+    Component.onCompleted: function(){
+        clearFields(); // remove placeholder text
+        Qt.application.name = "traininfo";
+        Qt.application.organization = "traininfo.jakub";
+        Qt.application.domain = "jakub"
+    }
 
     StackView{
         id: stack
@@ -219,5 +224,5 @@ ApplicationWindow {
         onError: {
             console.log('python error: ' + traceback);
         }
-    }   
+    }
 }

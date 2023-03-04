@@ -59,7 +59,7 @@ Page {
                         width: appLogo.adapt ? appLogo.width : Math.min(appLogo.width, appLogo.height)
                         height: appLogo.adapt ? appLogo.height : width
                         //radius: Math.min(width, height)
-                        radius: 20
+                        radius: units.gu(2.5) // adaptive radius
                     }
                 }
             }
