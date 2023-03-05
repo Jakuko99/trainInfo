@@ -2,8 +2,6 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.2
 import Qt.labs.settings 1.0
-/*import QtQuick.LocalStorage 2.0
-import "../src/storage.js" as Settings*/
 import io.thp.pyotherside 1.4
 
 Page {
@@ -12,16 +10,24 @@ Page {
 
     Settings {
         id: settings
+        category: "train_filters"
         property string typeR_train // passengerTrain types
         property string typeOs_train
         property string typeREX_train
         property string typeEx_train
+        property string typeZr_train
+        property string typeEN_train
+        property string typeSC_train
+        property string typeRJ_train
+        property string typeEC_train
+        property string typeIC_train
 
         property string typeMn_train    // freightTrain types
         property string typeNex_train
         property string typePn_train
         property string typeRv_train
         property string typeSv_train
+        property string typeVlec_train
         property string typeSluz_train
 
         Component.onCompleted: function(){ // set default values
@@ -29,17 +35,27 @@ Page {
                 settings.typeR_train = "yes";
                 settings.typeOs_train = "yes";
                 settings.typeREX_train = "yes";
-                settings.typeEx_train = "yes;"
+                settings.typeEx_train = "yes";
+                settings.typeZr_train = "yes";
+                settings.typeEN_train = "yes";
+                settings.typeSC_train = "yes";
+                settings.typeRJ_train = "yes";
+                settings.typeEC_train = "yes";
+                settings.typeIC_train = "yes";
 
                 settings.typeMn_train = "no";
                 settings.typeNex_train = "no";
                 settings.typePn_train = "no";
                 settings.typeRv_train = "no";
                 settings.typeSv_train = "no";
+                settings.typeVlec_train = "no";
                 settings.typeSluz_train = "no";
+                progressLabel.font.bold = true;
+                progressLabel.text = "Default config created, restart app for changes to take effect.";
             }
         }
     }
+
 
     header: ToolBar {
         id: toolbar
@@ -132,6 +148,7 @@ Page {
         id: progressLabel
         text: ""
         anchors.top: fetchButton.bottom
+        wrapMode: Text.WordWrap
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.leftMargin: marginVal
@@ -240,87 +257,102 @@ Page {
         id: settingsDialog
         x: Math.round((root.width - width) / 2)
         y: (root.height - height) / 2 - header.height
-        width: Math.round(root.width / 3 * 2)
+        width: 250
+        height: 500
         modal: true
         focus: true
         title: "Settings"
-
         standardButtons: Dialog.Ok
         onAccepted: {
             settingsDialog.close()
         }
-
         contentItem: ColumnLayout {
             id: settingsColumn
-            spacing: 5
+            spacing: 0
 
             Label{
                 id: helpLabel
                 text: "Filter options for train visibility:"
             }
-            CheckBox{
-                id: passengerTrain
-                checked: true
-                text: "Os (passenger train)"
-                onCheckStateChanged: settings.typeOs_train = ((passengerTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: passengerTrain.checkState = ((settings.typeOs_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: fastTrain
-                checked: true
-                text: "R (fast train)"
-                onCheckStateChanged: settings.typeR_train = ((fastTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: fastTrain.checkState = ((settings.typeR_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: expressTrain
-                checked: true
-                text: "Ex (express train)"
-                onCheckStateChanged: settings.typeEx_train = ((expressTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: expressTrain.checkState = ((settings.typeEx_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: regionalExpressTrain
-                checked: true
-                text: "REX (regional express train)"
-                onCheckStateChanged: settings.typeREX_train = ((regionalExpressTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: regionalExpressTrain.checkState = ((settings.typeREX_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: manipulationTrain
-                text: "Mn (manipulation train)"
-                onCheckStateChanged: settings.typeMn_train = ((manipulationTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: manipulationTrain.checkState = ((settings.typeMn_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: freightExpressTrain
-                text: "Nex (freight express)"
-                onCheckStateChanged: settings.typeNex_train = ((freightExpressTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: freightExpressTrain.checkState = ((settings.typeNex_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: intermediateFreightTrain
-                text: "Pn (intermediate freight train)"
-                onCheckStateChanged: settings.typePn_train = ((intermediateFreightTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: intermediateFreightTrain.checkState = ((settings.typePn_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: locomotiveTrain
-                text: "Rv (locomotive train)"
-                onCheckStateChanged: settings.typeRv_train = ((locomotiveTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: locomotiveTrain.checkState = ((settings.typeRv_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: setTrain
-                text: "Sv (set of trains)"
-                onCheckStateChanged: settings.typeSv_train = ((setTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: setTrain.checkState = ((settings.typeSv_train == "yes") ? Qt.Checked : Qt.Unchecked)
-            }
-            CheckBox{
-                id: serviceTrain
-                text: "Sluz (service train)"
-                onCheckStateChanged: settings.typeSluz_train = ((serviceTrain.checkState == Qt.Checked) ? "yes" : "no")
-                Component.onCompleted: serviceTrain.checkState = ((settings.typeSluz_train == "yes") ? Qt.Checked : Qt.Unchecked)
+
+            Flickable { //replace with list view and custom getter and setter functions for settings
+                id:filterFlickable
+                flickableDirection: Flickable.VerticalFlick
+                contentHeight: filterColumn.height
+                ScrollBar.vertical: ScrollBar {
+                    width: units.gu(1)
+                    anchors.right: parent.right
+                    policy: ScrollBar.AlwaysOn
+                }
+
+                ColumnLayout {
+                    id: filterColumn
+                    spacing: 5
+                    CheckBox{
+                        id: passengerTrain
+                        checked: true
+                        text: "Os (passenger train)"
+                        onCheckStateChanged: settings.typeOs_train = ((passengerTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: passengerTrain.checkState = ((settings.typeOs_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: fastTrain
+                        checked: true
+                        text: "R (fast train)"
+                        onCheckStateChanged: settings.typeR_train = ((fastTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: fastTrain.checkState = ((settings.typeR_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: expressTrain
+                        checked: true
+                        text: "Ex (express train)"
+                        onCheckStateChanged: settings.typeEx_train = ((expressTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: expressTrain.checkState = ((settings.typeEx_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: regionalExpressTrain
+                        checked: true
+                        text: "REX (regional express train)"
+                        onCheckStateChanged: settings.typeREX_train = ((regionalExpressTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: regionalExpressTrain.checkState = ((settings.typeREX_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: manipulationTrain
+                        text: "Mn (manipulation train)"
+                        onCheckStateChanged: settings.typeMn_train = ((manipulationTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: manipulationTrain.checkState = ((settings.typeMn_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: freightExpressTrain
+                        text: "Nex (freight express)"
+                        onCheckStateChanged: settings.typeNex_train = ((freightExpressTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: freightExpressTrain.checkState = ((settings.typeNex_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: intermediateFreightTrain
+                        text: "Pn (intermediate freight train)"
+                        onCheckStateChanged: settings.typePn_train = ((intermediateFreightTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: intermediateFreightTrain.checkState = ((settings.typePn_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: locomotiveTrain
+                        text: "Rv (locomotive train)"
+                        onCheckStateChanged: settings.typeRv_train = ((locomotiveTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: locomotiveTrain.checkState = ((settings.typeRv_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: setTrain
+                        text: "Sv (set of trains)"
+                        onCheckStateChanged: settings.typeSv_train = ((setTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: setTrain.checkState = ((settings.typeSv_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                    CheckBox{
+                        id: serviceTrain
+                        text: "Sluz (service train)"
+                        onCheckStateChanged: settings.typeSluz_train = ((serviceTrain.checkState == Qt.Checked) ? "yes" : "no")
+                        Component.onCompleted: serviceTrain.checkState = ((settings.typeSluz_train == "yes") ? Qt.Checked : Qt.Unchecked)
+                    }
+                }
             }
         }
     }
