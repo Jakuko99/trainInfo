@@ -43,5 +43,10 @@ Page {
             Layout.alignment: Qt.AlignHCenter
             font.bold: true
         }
+
+        Button {
+            id: restoreButton
+            text: "Restore default config"
+        }
     }
 }

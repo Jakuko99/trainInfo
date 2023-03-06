@@ -58,6 +58,18 @@ Page {
         }
     }
 
+    function filterAddItem(type){ // check if value should be added according to settings
+        var settingsVal = settings.value("type" + type + "_train", "not_set")
+        if (settingsVal === "yes"){
+            return true;
+        } else if (settingsVal === "no"){
+            return false;
+        } else {
+            return true; // return also types not defined in settings
+        }
+        //return ((settings.value("type" + type + "_train", "not_set") === "yes") ? true : false);
+    }
+
     header: ToolBar {
         id: toolbar
         RowLayout {
@@ -136,10 +148,14 @@ Page {
                         var delay = obj.Meskanie;
                         var delayVal = obj.Meskanie;
                         var provider = "Provider: " + obj.Dopravca;
-                        trainList.append({name: trainName, destinationFrom: trainDestFrom, destinationTo: trainDestTo, position:position, delay: delay, provider:provider})
+                        if (filterAddItem(obj.DruhVlakuKom.trim())){
+                            trainList.append({name: trainName, destinationFrom: trainDestFrom, destinationTo: trainDestTo, position:position, delay: delay, provider:provider});
+                        }
                     }
                 }
-
+                if (trainList.rowCount() === 0) { // if no items satisfy the set filters
+                    progressLabel.text = "No trains found for given filter selection. Change filters and try again.";
+                }
             }
             );
         }
@@ -258,8 +274,8 @@ Page {
         id: settingsDialog
         x: Math.round((root.width - width) / 2)
         y: (root.height - height) / 2 - header.height
-        width: 250
-        height: 500
+        width: units.gu(32)  //250
+        height: units.gu(63) //500
         modal: true
         focus: true
         title: "Settings"
@@ -286,81 +302,99 @@ Page {
                 ScrollBar.vertical: ScrollBar {
                     width: units.gu(1)
                     anchors.right: parent.right
-                    policy: ScrollBar.AlwaysOn
+                    policy: ScrollBar.AsNeeded // hide scrollbar after some time
                 }
                 model: ListModel{
                     id: trainFilterList
                     ListElement {
                         settingsID: "typeIC_train"
+                        shortID: "IC"
                         caption: "IC (intercity train)"
                     }
                     ListElement {
                         settingsID: "typeEC_train"
-                        caption: "EC (add more)"
+                        shortID: "EC"
+                        caption: "EC (eurocity train)"
                     }
                     ListElement {
                         settingsID: "typeRJ_train"
+                        shortID: "RJ"
                         caption: "RJ (RegioJet train)"
                     }
                     ListElement {
                         settingsID: "typeSC_train"
-                        caption: "SC (add more)"
+                        shortID: "SC"
+                        caption: "SC (supercity train)"
                     }
                     ListElement {
                         settingsID: "typeEN_train"
-                        caption: "EN (add more)"
+                        shortID: "EN"
+                        caption: "EN (euronight train)"
                     }
                     ListElement {
                         settingsID: "typeZr_train"
-                        caption: "Zr (add explanation)"
+                        shortID: "Zr"
+                        caption: "Zr (accelerated train)"
                     }
                     ListElement {
                         settingsID: "typerjx_train"
+                        shortID: "rjx"
                         caption: "rjx (railjet express)"
                     }
                     ListElement {
                         settingsID: "typeEx_train"
+                        shortID: "Ex"
                         caption: "Ex (express train)"
                     }
                     ListElement {
                         settingsID: "typeR_train"
+                        shortID: "R"
                         caption: "R (fast train)"
                     }
                     ListElement {
                         settingsID: "typeREX_train"
+                        shortID: "REX"
                         caption: "REX (regional express)"
                     }
                     ListElement {
                         settingsID: "typeOs_train"
+                        shortID: "Os"
                         caption: "Os (passenger train)"
                     }
 
                     ListElement {
                         settingsID: "typeMn_train"
+                        shortID: "Mn"
                         caption: "Mn (maniputaion train)"
                     }
                     ListElement {
                         settingsID: "typeNex_train"
+                        shortID: "Nex"
                         caption: "Nex (freight express)"
                     }
                     ListElement {
                         settingsID: "typePn_train"
+                        shortID: "Pn"
                         caption: "Pn (intermediate freight train)"
                     }
                     ListElement {
                         settingsID: "typeRv_train"
-                        caption: "Rv (locomitive train)"
+                        shortID: "Rv"
+                        caption: "Rv (locomotive train)"
                     }
                     ListElement {
                         settingsID: "typeSv_train"
+                        shortID: "Sv"
                         caption: "Sv (set of trains)"
                     }
                     ListElement {
                         settingsID: "typeVlec_train"
-                        caption: "Vlec (add info)"
+                        shortID: "Vlec"
+                        caption: "Vlec (siding train)"
                     }
                     ListElement {
                         settingsID: "typeSluz_train"
+                        shortID: "Sluz"
                         caption: "Sluz (service train)"
                     }
                 }

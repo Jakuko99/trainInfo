@@ -42,9 +42,7 @@ ApplicationWindow {
 
     Component.onCompleted: function(){
         clearFields(); // remove placeholder text
-        Qt.application.name = "traininfo";
-        Qt.application.organization = "traininfo.jakub";
-        Qt.application.domain = "jakub"
+        Qt.application.name = "traininfo.jakub";
     }
 
     StackView{
