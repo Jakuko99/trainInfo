@@ -86,8 +86,12 @@ ApplicationWindow {
                             onTriggered: stack.push(Qt.resolvedUrl("allTrains.qml"))
                         }
                         MenuItem {
-                            text: "Settings"
-                            onTriggered: stack.push(Qt.resolvedUrl("settingsPage.qml"))
+                            text: "Favorite trains"
+                            onTriggered: stack.push(Qt.resolvedUrl("watchedTrains.qml"))
+                        }
+                        MenuItem {
+                            text: "Options"
+                            onTriggered: stack.push(Qt.resolvedUrl("optionsPage.qml"))
                         }
                         MenuItem {
                             text: "About"
@@ -140,6 +144,13 @@ ApplicationWindow {
                             trainDestLabel.text = json_obj.StanicaVychodzia + " (" + json_obj.CasVychodzia + ") -> " + json_obj.StanicaCielova + " (" + json_obj.CasCielova + ")";
                             positionLabel.text = "Position: " + json_obj.StanicaUdalosti + " " + json_obj.CasUdalosti + " Delay: " + json_obj.Meskanie + " min";
                             providerLabel.text = "Provider: " + json_obj.Dopravca;
+                            if (json_obj.Meskanie < 5){ // color code position based on delay
+                                positionLabel.color = "green";
+                            } else if ((json_obj.Meskanie >= 5) && (json_obj.Meskanie < 20)){
+                                positionLabel.color = "orange";
+                            } else {
+                                positionLabel.color = "red";
+                            }
                         } else { // train not found
                             nameLabel.text = "Train not found";
                             trainDestLabel.text = "";
@@ -202,6 +213,7 @@ ApplicationWindow {
                 wrapMode: Text.WordWrap
             }
             Button {
+                id: clearButton
                 text: qsTr("Clear")
                 anchors.right: parent.right
                 anchors.rightMargin: marginVal
