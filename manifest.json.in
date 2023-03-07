@@ -7,6 +7,10 @@
         "traininfo": {
             "apparmor": "traininfo.apparmor",
             "desktop":  "traininfo.desktop"
+        },
+        "push": {
+                "apparmor": "push-apparmor.json",
+                "push-helper": "push.json"
         }
     },
     "version": "@BUILD_VERSION@",
