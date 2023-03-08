@@ -67,7 +67,7 @@ Page {
                     }
                     MenuItem {
                         text: "Remove all trains" // add confirmation dialog
-                        onTriggered: dataModel.clear()
+                        onTriggered: confirmDialog.open()
                     }
                 }
             }
@@ -86,7 +86,7 @@ Page {
         ScrollBar.vertical: ScrollBar {
             width: units.gu(1)
             anchors.right: parent.right
-            policy: ScrollBar.AlwaysOn
+            policy: ScrollBar.AsNeeded
         }
         model: dataModel
 
@@ -221,12 +221,12 @@ Page {
                     delegate: Item {
                         id: watchItem
                         width: parent.width
-                        height: filterColumn.height
+                        height: itemColumn.height
                         ColumnLayout {
-                            id: filterColumn
+                            id: itemColumn
                             Layout.fillWidth: true
                             RowLayout{
-                                id: manageRow //sort out alignment
+                                id: manageRow
                                 Layout.fillWidth: true
                                 Label {
                                     id: numberLabel
@@ -237,7 +237,6 @@ Page {
                                     id: removeButton
                                     text: "Remove"
                                     Layout.alignment: Qt.AlignRight
-                                    Layout.leftMargin: units.gu(12)
                                     onClicked: dataModel.remove(index)
                                 }
                             }
@@ -246,6 +245,7 @@ Page {
                 }
             }
         }
+
         Dialog {
             id: addDialog
             x: Math.round((root.width - width) / 2)
@@ -257,12 +257,14 @@ Page {
             title: "Add new item"
             standardButtons: Dialog.Ok
             onAccepted: {
-                dataModel.append({number: Number(trainNumb.text)})
+                if (trainNumb.text !== "") { // if there is not text, ignore input
+                    dataModel.append({number: Number(trainNumb.text)})
+                }
+                trainNumb.text = "";
                 manageDialog.close()
             }
             Component.onCompleted: {
                 addDialog.standardButton(Dialog.Ok).text = qsTrId("Add"); // rename dialog button
-                trainNumb.text = ""; // move this to opened
             }
 
             contentItem: ColumnLayout {
@@ -272,6 +274,33 @@ Page {
                     placeholderText: "Enter train number..."
                     text: ""
                     validator: IntValidator{bottom: 0; top: 10000}
+                }
+            }
+        }
+
+        Dialog { //confirm before deleting all dialog
+            id: confirmDialog
+            x: Math.round((root.width - width) / 2)
+            y: (root.height - height) / 2 - header.height
+            width: units.gu(32)  //250
+            height: units.gu(20) //500
+            modal: true
+            focus: true
+            title: "Confirm action"
+            standardButtons: Dialog.Yes | Dialog.No
+            onAccepted: {
+                dataModel.clear();
+                confirmDialog.close();
+            }
+
+            contentItem: ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                Label {
+                    text: "Are you sure to remove all trains from the list?"
+                    font.bold: true
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
                 }
             }
         }
