@@ -13,6 +13,7 @@ Page {
         id: filter_options
         category: "train_filters" // access settings group defined in different page
     }
+
     Dialog {
         id: infoDialog
         x: Math.round((root.width - width) / 2)

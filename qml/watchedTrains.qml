@@ -66,7 +66,7 @@ Page {
                         onTriggered: manageDialog.open()
                     }
                     MenuItem {
-                        text: "Remove all trains" // add confirmation dialog
+                        text: "Remove all trains"
                         onTriggered: confirmDialog.open()
                     }
                 }
@@ -231,13 +231,13 @@ Page {
                                 Label {
                                     id: numberLabel
                                     text: number
-                                    Layout.alignment: Qt.AlignLeft
-                                }
+                                    Layout.alignment: Qt.AlignLeft                                    
+                                } // figure out proper aligment for this list
                                 Button{
                                     id: removeButton
                                     text: "Remove"
                                     Layout.alignment: Qt.AlignRight
-                                    onClicked: dataModel.remove(index)
+                                    onClicked: dataModel.remove(index) // remove item from model
                                 }
                             }
                         }
@@ -271,6 +271,7 @@ Page {
                 spacing: 0
                 TextField {
                     id: trainNumb
+                    Layout.fillWidth: true
                     placeholderText: "Enter train number..."
                     text: ""
                     validator: IntValidator{bottom: 0; top: 10000}
