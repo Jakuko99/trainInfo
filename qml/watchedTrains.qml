@@ -58,101 +58,119 @@ Page {
                     y: parent.height
 
                     MenuItem {
-                        text: "Clear list"
-                        onTriggered: contentTrainList.model.clear()
-                    } // add method for addings trains and how to store them
+                        text: "Add new train"
+                        onTriggered: addDialog.open()
+                    }
                     MenuItem {
                         text: "Manage watched trains"
                         onTriggered: manageDialog.open()
+                    }
+                    MenuItem {
+                        text: "Remove all trains" // add confirmation dialog
+                        onTriggered: dataModel.clear()
                     }
                 }
             }
         }
     }
-    ColumnLayout {
-        id: watchColumn
-        anchors.top: parent.top
+    ListView {
+        id: favoriteTrainView
+        clip: true
+        anchors.fill: parent
         anchors.topMargin: marginVal
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.rightMargin: marginVal
+        anchors.bottomMargin: marginVal
         anchors.leftMargin: marginVal
-        Button {
-            text: "Fetch data"
-            Layout.fillWidth: true
+        anchors.rightMargin: marginVal
+        flickableDirection: Flickable.VerticalFlick
+        boundsBehavior: Flickable.StopAtBounds
+        ScrollBar.vertical: ScrollBar {
+            width: units.gu(1)
+            anchors.right: parent.right
+            policy: ScrollBar.AlwaysOn
         }
-        ListView {
-            id: favoriteTrainView
-            ListView{
-                id: contentTrainList
-                clip: true
-                anchors.fill: parent
-                flickableDirection: Flickable.VerticalFlick
-                boundsBehavior: Flickable.StopAtBounds
-                ScrollBar.vertical: ScrollBar {
-                    width: units.gu(1)
-                    anchors.right: parent.right
-                    policy: ScrollBar.AlwaysOn
-                }
-                model: ListModel{
-                    id: trainList
-                }
+        model: dataModel
 
-                delegate: Item {
-                    width: parent.width
-                    height: contentFrame.height + marginVal
-                    Frame {
-                        id: contentFrame
-                        width: parent.width
-                        ColumnLayout {
-                            id: frameColumn
-                            Layout.fillWidth: true
-                            anchors.right: parent.right
-                            anchors.left: parent.left
-                            spacing: 0
-                            Label {
-                                id: trainName
-                                text: name
-                                wrapMode: Text.WordWrap
-                                color: "#247cd7"
-                                font.bold: true
-                            }
-                            Label {
-                                id: trainDestInfo
-                                text: destinationFrom
-                                wrapMode: Text.WordWrap
-                            }
-                            Label {
-                                id: trainDestInfoCont
-                                text: destinationTo
-                                wrapMode: Text.WordWrap
-                            }
-                            Label {
-                                id: positionInfo
-                                text: position
-                                wrapMode: Text.WordWrap
-                                font.bold: true
-                            }
-                            Label{
-                                id: delayInfo
-                                text: 'Delay: '+ delay + ' min'
-                                Component.onCompleted: function(){ //adjust color based on delay value
-                                    if (delay < 5){
+        delegate: Item {
+            width: parent.width
+            height: contentFrame.height + marginVal
+            Frame {
+                id: contentFrame
+                width: parent.width
+                ColumnLayout {
+                    id: frameColumn
+                    Layout.fillWidth: true
+                    anchors.right: parent.right
+                    anchors.left: parent.left
+                    spacing: 0
+                    Label {
+                        id: trainName
+                        text: number
+                        wrapMode: Text.WordWrap
+                        color: "#247cd7"
+                        font.bold: true
+                    }
+                    Label {
+                        id: trainDestInfo
+                        //text: destinationFrom
+                        wrapMode: Text.WordWrap
+                    }
+                    Label {
+                        id: trainDestInfoCont
+                        //text: destinationTo
+                        wrapMode: Text.WordWrap
+                    }
+                    Label {
+                        id: positionInfo
+                        //text: position
+                        wrapMode: Text.WordWrap
+                        font.bold: true
+                    }
+                    Label{
+                        id: delayInfo
+                        //text: 'Delay: '+ delay + ' min'
+                        wrapMode: Text.WordWrap
+                        font.bold: true
+                    }
+                    Label {
+                        id: providerInfo
+                        //text: provider
+                        wrapMode: Text.WordWrap
+                    }
+                    Button {
+                        text: "Fetch data"
+                        Layout.alignment: Qt.AlignRight
+                        onClicked: function(){
+                            trainName.text = "Fetching train info..." //show that something is happening
+                            python.call("example.getData", [number], function(returnVal) {
+                                const json_obj = JSON.parse(returnVal);
+                                //console.log(returnVal)
+                                if (json_obj["CisloVlaku"]){ // train found
+                                    if (json_obj["NazovVlaku"]){
+                                        trainName.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku + " " + json_obj.NazovVlaku;
+                                    } else {
+                                        trainName.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku;
+                                    }
+                                    trainDestInfo.text = json_obj.StanicaVychodzia + " (" + json_obj.CasVychodzia + ") -> ";
+                                    trainDestInfoCont.text = json_obj.StanicaCielova + " (" + json_obj.CasCielova + ")";
+                                    positionInfo.text = "Position: " + json_obj.StanicaUdalosti + " " + json_obj.CasUdalosti;
+                                    delayInfo.text = "Delay: " + json_obj.Meskanie + " min";
+                                    providerInfo.text = "Provider: " + json_obj.Dopravca;
+                                    if (json_obj.Meskanie < 5){ // color code position based on delay
                                         delayInfo.color = "green";
-                                    } else if ((delay >= 5) && (delay < 20)){
+                                    } else if ((json_obj.Meskanie >= 5) && (json_obj.Meskanie < 20)){
                                         delayInfo.color = "orange";
                                     } else {
                                         delayInfo.color = "red";
                                     }
+                                } else { // train not found
+                                    trainName.text = "Train not found";
+                                    trainDestInfo.text = "";
+                                    trainDestInfoCont.text = "";
+                                    positionInfo.text = "";
+                                    providerInfo.text = "";
                                 }
-                                wrapMode: Text.WordWrap
-                                font.bold: true
                             }
-                            Label {
-                                id: providerInfo
-                                text: provider
-                                wrapMode: Text.WordWrap
-                            }
+                            );
                         }
                     }
                 }
@@ -170,6 +188,7 @@ Page {
                 console.log('python error: ' + traceback);
             }
         }
+
         Dialog {
             id: manageDialog
             x: Math.round((root.width - width) / 2)
@@ -178,23 +197,17 @@ Page {
             height: units.gu(63) //500
             modal: true
             focus: true
-            title: "Settings"
+            title: "Manage watched trains"
             standardButtons: Dialog.Ok
             onAccepted: {
                 manageDialog.close()
             }
             contentItem: ColumnLayout {
-                id: settingsColumn
                 spacing: 0
-
-                Label{
-                    id: helpLabel
-                    text: "Filter options for train visibility:"
-                }
-
                 ListView {
-                    id: filterList
+                    id: trainList
                     clip: true
+                    spacing: marginVal
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     flickableDirection: Flickable.VerticalFlick
@@ -205,26 +218,60 @@ Page {
                         policy: ScrollBar.AsNeeded // hide scrollbar after some time
                     }
                     model: dataModel
-
                     delegate: Item {
+                        id: watchItem
                         width: parent.width
                         height: filterColumn.height
                         ColumnLayout {
                             id: filterColumn
+                            Layout.fillWidth: true
                             RowLayout{
-                                id: manageRow
+                                id: manageRow //sort out alignment
+                                Layout.fillWidth: true
                                 Label {
-                                    text: "Train number: " + number
+                                    id: numberLabel
+                                    text: number
+                                    Layout.alignment: Qt.AlignLeft
                                 }
                                 Button{
-                                    text: "Delete"
+                                    id: removeButton
+                                    text: "Remove"
+                                    Layout.alignment: Qt.AlignRight
+                                    Layout.leftMargin: units.gu(12)
+                                    onClicked: dataModel.remove(index)
                                 }
-                            }
-                            Label{
-                                text: "Comment: " + text
                             }
                         }
                     }
+                }
+            }
+        }
+        Dialog {
+            id: addDialog
+            x: Math.round((root.width - width) / 2)
+            y: (root.height - height) / 2 - header.height
+            width: units.gu(32)  //250
+            height: units.gu(20) //500
+            modal: true
+            focus: true
+            title: "Add new item"
+            standardButtons: Dialog.Ok
+            onAccepted: {
+                dataModel.append({number: Number(trainNumb.text)})
+                manageDialog.close()
+            }
+            Component.onCompleted: {
+                addDialog.standardButton(Dialog.Ok).text = qsTrId("Add"); // rename dialog button
+                trainNumb.text = ""; // move this to opened
+            }
+
+            contentItem: ColumnLayout {
+                spacing: 0
+                TextField {
+                    id: trainNumb
+                    placeholderText: "Enter train number..."
+                    text: ""
+                    validator: IntValidator{bottom: 0; top: 10000}
                 }
             }
         }
