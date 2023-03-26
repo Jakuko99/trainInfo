@@ -5,3 +5,6 @@ Icon=assets/logo.jpg
 Terminal=false
 Type=Application
 X-Ubuntu-Touch=true
+X-Ubuntu-Splash-Show-Header=false
+X-Ubuntu-Splash-Color=#1b1a46
+X-Ubuntu-Splash-Image=assets/logo_transparent.png
