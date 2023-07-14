@@ -9,7 +9,7 @@
             "desktop":  "traininfo.desktop"
         }
     },
-    "version": "@BUILD_VERSION@",
+    "version": "0.1.2",
     "maintainer": "Jakub Krsko <jakubkrs@outlook.sk>",
     "framework" : "@CLICK_FRAMEWORK@"
 }

@@ -40,6 +40,11 @@ ApplicationWindow {
         providerLabel.text = "";
     }
 
+    Settings{
+        id: mainPageSettings
+        property string default_number
+    }
+
     Component.onCompleted: function(){
         clearFields(); // remove placeholder text
         Qt.application.name = "traininfo.jakub";
@@ -123,14 +128,17 @@ ApplicationWindow {
             TextField {
                 id: numberField
                 text: qsTr("")
-                placeholderText: "Enter train number..."
-                validator: IntValidator{bottom: 0; top: 10000}
+                placeholderText: mainPageSettings.default_number
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
             }
             Button {
                 id: button
                 text: qsTr("Search")
                 onClicked: function(){
-                    clearFields()
+                    clearFields();
+                    numberField.text === "" ? numberField.text = numberField.placeholderText : undefined;
+                    mainPageSettings.default_number = numberField.text;
+
                     nameLabel.text = "Fetching train info..." //show that something is happening
                     python.call("example.getData", [numberField.text], function(returnVal) {
                         const json_obj = JSON.parse(returnVal);

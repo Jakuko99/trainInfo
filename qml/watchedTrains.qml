@@ -274,7 +274,7 @@ Page {
                     Layout.fillWidth: true
                     placeholderText: "Enter train number..."
                     text: ""
-                    validator: IntValidator{bottom: 0; top: 10000}
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
                 }
             }
         }
