@@ -11,7 +11,8 @@ Page {
     Settings {
         id: settings
         category: "train_filters"
-        property string typeR_train // passengerTrain types
+        // passengerTrain types
+        property string typeR_train
         property string typeOs_train
         property string typeREX_train
         property string typerjx_train
@@ -23,7 +24,8 @@ Page {
         property string typeEC_train
         property string typeIC_train
 
-        property string typeMn_train    // freightTrain types
+        // freightTrain types
+        property string typeMn_train
         property string typeNex_train
         property string typePn_train
         property string typeRv_train
@@ -31,41 +33,44 @@ Page {
         property string typeVlec_train
         property string typeSluz_train
 
-        Component.onCompleted: function(){ // set default values
-            if (settings.value("typeMn_train", "") === ""){
-                settings.typeR_train = "yes";
-                settings.typeOs_train = "yes";
-                settings.typeREX_train = "yes";
-                settings.typerjx_train = "yes";
-                settings.typeEx_train = "yes";
-                settings.typeZr_train = "yes";
-                settings.typeEN_train = "yes";
-                settings.typeSC_train = "yes";
-                settings.typeRJ_train = "yes";
-                settings.typeEC_train = "yes";
-                settings.typeIC_train = "yes";
+        Component.onCompleted: function () {
+            // set default values
+            if (settings.value("typeMn_train", "") === "") {
+                settings.typeR_train = "yes"
+                settings.typeOs_train = "yes"
+                settings.typeREX_train = "yes"
+                settings.typerjx_train = "yes"
+                settings.typeEx_train = "yes"
+                settings.typeZr_train = "yes"
+                settings.typeEN_train = "yes"
+                settings.typeSC_train = "yes"
+                settings.typeRJ_train = "yes"
+                settings.typeEC_train = "yes"
+                settings.typeIC_train = "yes"
 
-                settings.typeMn_train = "no";
-                settings.typeNex_train = "no";
-                settings.typePn_train = "no";
-                settings.typeRv_train = "no";
-                settings.typeSv_train = "no";
-                settings.typeVlec_train = "no";
-                settings.typeSluz_train = "no";
-                progressLabel.font.bold = true;
-                progressLabel.text = "Default config created, restart app for changes to take effect.";
+                settings.typeMn_train = "no"
+                settings.typeNex_train = "no"
+                settings.typePn_train = "no"
+                settings.typeRv_train = "no"
+                settings.typeSv_train = "no"
+                settings.typeVlec_train = "no"
+                settings.typeSluz_train = "no"
+                progressLabel.font.bold = true
+                progressLabel.text
+                        = "Default config created, restart app for changes to take effect."
             }
         }
     }
 
-    function filterAddItem(type){ // check if value should be added according to settings
+    function filterAddItem(type) {
+        // check if value should be added according to settings
         var settingsVal = settings.value("type" + type + "_train", "not_set")
-        if (settingsVal === "yes"){
-            return true;
-        } else if (settingsVal === "no"){
-            return false;
+        if (settingsVal === "yes") {
+            return true
+        } else if (settingsVal === "no") {
+            return false
         } else {
-            return true; // return also types not defined in settings
+            return true // return also types not defined in settings
         }
         //return ((settings.value("type" + type + "_train", "not_set") === "yes") ? true : false);
     }
@@ -99,7 +104,7 @@ Page {
                         text: "Clear list"
                         onTriggered: contentTrainList.model.clear()
                     }
-                    MenuItem{
+                    MenuItem {
                         text: 'Settings'
                         onTriggered: settingsDialog.open()
                     }
@@ -127,41 +132,51 @@ Page {
         anchors.rightMargin: marginVal
         anchors.topMargin: marginVal
         anchors.right: parent.right
-        onClicked: function(){
+        onClicked: function () {
             contentTrainList.model.clear() //remove old items
             progressLabel.text = "Fetching train info..." //show that something is happening
-            python.call("example.getAllData", [], function(returnVal) {
-                const json_obj = JSON.parse(returnVal);
-                progressLabel.text = "";
-                for(let i = 0; i < json_obj.length; i++) {
-                    let obj = json_obj[i];
-                    var trainName = "";
-                    if (obj["CisloVlaku"]){ // train found
-                        if (obj["NazovVlaku"]){
-                            trainName = obj.DruhVlakuKom.trim() + ' ' + obj.CisloVlaku + " " + obj.NazovVlaku;
+            python.call("example.getAllData", [], function (returnVal) {
+                const json_obj = JSON.parse(returnVal)
+                progressLabel.text = ""
+                for (var i = 0; i < json_obj.length; i++) {
+                    let obj = json_obj[i]
+                    var trainName = ""
+                    if (obj["CisloVlaku"]) {
+                        // train found
+                        if (obj["NazovVlaku"]) {
+                            trainName = obj.DruhVlakuKom.trim(
+                                        ) + ' ' + obj.CisloVlaku + " " + obj.NazovVlaku
                         } else {
-                            trainName = obj.DruhVlakuKom.trim() + ' ' + obj.CisloVlaku;
+                            trainName = obj.DruhVlakuKom.trim(
+                                        ) + ' ' + obj.CisloVlaku
                         }
-                        var trainDestFrom = obj.StanicaVychodzia + " (" + obj.CasVychodzia + ") -> ";
-                        var trainDestTo = obj.StanicaCielova + " (" + obj.CasCielova + ")";
-                        var position = obj.StanicaUdalosti + " " + obj.CasUdalosti;
-                        var delay = obj.Meskanie;
-                        var delayVal = obj.Meskanie;
-                        var provider = "Provider: " + obj.Dopravca;
-                        if (filterAddItem(obj.DruhVlakuKom.trim())){
-                            trainList.append({name: trainName, destinationFrom: trainDestFrom, destinationTo: trainDestTo, position:position, delay: delay, provider:provider});
+                        var trainDestFrom = obj.StanicaVychodzia + " (" + obj.CasVychodzia + ") -> "
+                        var trainDestTo = obj.StanicaCielova + " (" + obj.CasCielova + ")"
+                        var position = obj.StanicaUdalosti + " " + obj.CasUdalosti
+                        var delay = obj.Meskanie
+                        var delayVal = obj.Meskanie
+                        var provider = "Provider: " + obj.Dopravca
+                        if (filterAddItem(obj.DruhVlakuKom.trim())) {
+                            trainList.append({
+                                                 "name": trainName,
+                                                 "destinationFrom": trainDestFrom,
+                                                 "destinationTo": trainDestTo,
+                                                 "position": position,
+                                                 "delay": delay,
+                                                 "provider": provider
+                                             })
                         }
                     }
                 }
-                if (trainList.rowCount() === 0) { // if no items satisfy the set filters
-                    progressLabel.text = "No trains found for given filter selection. Change filters and try again.";
+                if (trainList.rowCount() === 0) {
+                    // if no items satisfy the set filters
+                    progressLabel.text = "No trains found for given filter selection. Change filters and try again."
                 }
-            }
-            );
+            })
         }
     }
 
-    Label{
+    Label {
         id: progressLabel
         text: ""
         anchors.top: fetchButton.bottom
@@ -183,7 +198,7 @@ Page {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
 
-        ListView{
+        ListView {
             id: contentTrainList
             clip: true
             anchors.fill: parent
@@ -194,7 +209,7 @@ Page {
                 anchors.right: parent.right
                 policy: ScrollBar.AlwaysOn
             }
-            model: ListModel{
+            model: ListModel {
                 id: trainList
             }
 
@@ -233,16 +248,17 @@ Page {
                             wrapMode: Text.WordWrap
                             font.bold: true
                         }
-                        Label{
+                        Label {
                             id: delayInfo
-                            text: 'Delay: '+ delay + ' min'
-                            Component.onCompleted: function(){ //adjust color based on delay value
-                                if (delay < 5){
-                                    delayInfo.color = "green";
-                                } else if ((delay >= 5) && (delay < 20)){
-                                    delayInfo.color = "orange";
+                            text: 'Delay: ' + delay + ' min'
+                            Component.onCompleted: function () {
+                                //adjust color based on delay value
+                                if (delay < 5) {
+                                    delayInfo.color = "green"
+                                } else if ((delay >= 5) && (delay < 20)) {
+                                    delayInfo.color = "orange"
                                 } else {
-                                    delayInfo.color = "red";
+                                    delayInfo.color = "red"
                                 }
                             }
                             wrapMode: Text.WordWrap
@@ -262,19 +278,18 @@ Page {
     Python {
         id: python
         Component.onCompleted: {
-            addImportPath(Qt.resolvedUrl('../src/'));
-            importModule('example', function() {
-            });
+            addImportPath(Qt.resolvedUrl('../src/'))
+            importModule('example', function () {})
         }
         onError: {
-            console.log('python error: ' + traceback);
+            console.log('python error: ' + traceback)
         }
     }
     Dialog {
         id: settingsDialog
         x: Math.round((root.width - width) / 2)
         y: (root.height - height) / 2 - header.height
-        width: units.gu(32)  //250
+        width: units.gu(32) //250
         height: units.gu(63) //500
         modal: true
         focus: true
@@ -287,7 +302,7 @@ Page {
             id: settingsColumn
             spacing: 0
 
-            Label{
+            Label {
                 id: helpLabel
                 text: "Filter options for train visibility:"
             }
@@ -304,7 +319,7 @@ Page {
                     anchors.right: parent.right
                     policy: ScrollBar.AsNeeded // hide scrollbar after some time
                 }
-                model: ListModel{
+                model: ListModel {
                     id: trainFilterList
                     ListElement {
                         settingsID: "typeIC_train"
@@ -404,11 +419,15 @@ Page {
                     height: filterColumn.height
                     ColumnLayout {
                         id: filterColumn
-                        CheckBox{
+                        CheckBox {
                             id: filterCheckbox
                             text: caption
-                            onCheckStateChanged: settings.setValue(settingsID, ((filterCheckbox.checkState == Qt.Checked) ? "yes" : "no"))
-                            checked: ((settings.value(settingsID) === "yes") ? true : false)
+                            onCheckStateChanged: settings.setValue(
+                                                     settingsID,
+                                                     ((filterCheckbox.checkState
+                                                       == Qt.Checked) ? "yes" : "no"))
+                            checked: ((settings.value(
+                                           settingsID) === "yes") ? true : false)
                         }
                     }
                 }

@@ -5,26 +5,30 @@ import Qt.labs.settings 1.0
 import io.thp.pyotherside 1.4
 
 Page {
-    id: allTrainsPage
+    id: watchedTrainsPage
     property real marginVal: units.gu(1)
     property string datastore: ""
 
     Settings {
         id: watchedItems
         category: "watched_items"
-        property alias watched_trains: allTrainsPage.datastore
+        property alias watched_trains: watchedTrainsPage.datastore
     }
 
-    Component.onCompleted: { // load model from config file
+    Component.onCompleted: {
+        // load model from config file
         if (datastore) {
             dataModel.clear()
             var datamodel = JSON.parse(datastore)
-            for (var i = 0; i < datamodel.length; ++i) dataModel.append(datamodel[i])
+            for (var i = 0; i < datamodel.length; ++i)
+                dataModel.append(datamodel[i])
         }
     }
-    Component.onDestruction: { //save model to config file
+    Component.onDestruction: {
+        //save model to config file
         var datamodel = []
-        for (var i = 0; i < dataModel.count; ++i) datamodel.push(dataModel.get(i))
+        for (var i = 0; i < dataModel.count; ++i)
+            datamodel.push(dataModel.get(i))
         datastore = JSON.stringify(datamodel)
     }
 
@@ -125,7 +129,7 @@ Page {
                         wrapMode: Text.WordWrap
                         font.bold: true
                     }
-                    Label{
+                    Label {
                         id: delayInfo
                         //text: 'Delay: '+ delay + ' min'
                         wrapMode: Text.WordWrap
@@ -139,38 +143,52 @@ Page {
                     Button {
                         text: "Fetch data"
                         Layout.alignment: Qt.AlignRight
-                        onClicked: function(){
-                            trainName.text = "Fetching train info..." //show that something is happening
-                            python.call("example.getData", [number], function(returnVal) {
-                                const json_obj = JSON.parse(returnVal);
-                                //console.log(returnVal)
-                                if (json_obj["CisloVlaku"]){ // train found
-                                    if (json_obj["NazovVlaku"]){
-                                        trainName.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku + " " + json_obj.NazovVlaku;
-                                    } else {
-                                        trainName.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku;
-                                    }
-                                    trainDestInfo.text = json_obj.StanicaVychodzia + " (" + json_obj.CasVychodzia + ") -> ";
-                                    trainDestInfoCont.text = json_obj.StanicaCielova + " (" + json_obj.CasCielova + ")";
-                                    positionInfo.text = "Position: " + json_obj.StanicaUdalosti + " " + json_obj.CasUdalosti;
-                                    delayInfo.text = "Delay: " + json_obj.Meskanie + " min";
-                                    providerInfo.text = "Provider: " + json_obj.Dopravca;
-                                    if (json_obj.Meskanie < 5){ // color code position based on delay
-                                        delayInfo.color = "green";
-                                    } else if ((json_obj.Meskanie >= 5) && (json_obj.Meskanie < 20)){
-                                        delayInfo.color = "orange";
-                                    } else {
-                                        delayInfo.color = "red";
-                                    }
-                                } else { // train not found
-                                    trainName.text = "Train not found";
-                                    trainDestInfo.text = "";
-                                    trainDestInfoCont.text = "";
-                                    positionInfo.text = "";
-                                    providerInfo.text = "";
-                                }
-                            }
-                            );
+                        onClicked: function () {
+                            trainName.text
+                                    = "Fetching train info..." //show that something is happening
+                            python.call("example.getData", [number],
+                                        function (returnVal) {
+                                            const json_obj = JSON.parse(
+                                                               returnVal)
+                                            //console.log(returnVal)
+                                            if (json_obj["CisloVlaku"]) {
+                                                // train found
+                                                if (json_obj["NazovVlaku"]) {
+                                                    trainName.text = json_obj.DruhVlakuKom.trim(
+                                                                ) + ' ' + json_obj.CisloVlaku + " "
+                                                            + json_obj.NazovVlaku
+                                                } else {
+                                                    trainName.text = json_obj.DruhVlakuKom.trim(
+                                                                ) + ' ' + json_obj.CisloVlaku
+                                                }
+                                                trainDestInfo.text = json_obj.StanicaVychodzia
+                                                        + " (" + json_obj.CasVychodzia + ") -> "
+                                                trainDestInfoCont.text = json_obj.StanicaCielova
+                                                        + " (" + json_obj.CasCielova + ")"
+                                                positionInfo.text = "Position: "
+                                                        + json_obj.StanicaUdalosti + " "
+                                                        + json_obj.CasUdalosti
+                                                delayInfo.text = "Delay: "
+                                                        + json_obj.Meskanie + " min"
+                                                providerInfo.text = "Provider: " + json_obj.Dopravca
+                                                if (json_obj.Meskanie < 5) {
+                                                    // color code position based on delay
+                                                    delayInfo.color = "green"
+                                                } else if ((json_obj.Meskanie >= 5)
+                                                           && (json_obj.Meskanie < 20)) {
+                                                    delayInfo.color = "orange"
+                                                } else {
+                                                    delayInfo.color = "red"
+                                                }
+                                            } else {
+                                                // train not found
+                                                trainName.text = "Train not found"
+                                                trainDestInfo.text = ""
+                                                trainDestInfoCont.text = ""
+                                                positionInfo.text = ""
+                                                providerInfo.text = ""
+                                            }
+                                        })
                         }
                     }
                 }
@@ -180,12 +198,11 @@ Page {
         Python {
             id: python
             Component.onCompleted: {
-                addImportPath(Qt.resolvedUrl('../src/'));
-                importModule('example', function() {
-                });
+                addImportPath(Qt.resolvedUrl('../src/'))
+                importModule('example', function () {})
             }
             onError: {
-                console.log('python error: ' + traceback);
+                console.log('python error: ' + traceback)
             }
         }
 
@@ -193,7 +210,7 @@ Page {
             id: manageDialog
             x: Math.round((root.width - width) / 2)
             y: (root.height - height) / 2 - header.height
-            width: units.gu(32)  //250
+            width: units.gu(32) //250
             height: units.gu(63) //500
             modal: true
             focus: true
@@ -225,19 +242,20 @@ Page {
                         ColumnLayout {
                             id: itemColumn
                             Layout.fillWidth: true
-                            RowLayout{
+                            RowLayout {
                                 id: manageRow
                                 Layout.fillWidth: true
                                 Label {
                                     id: numberLabel
                                     text: number
-                                    Layout.alignment: Qt.AlignLeft                                    
+                                    Layout.alignment: Qt.AlignLeft
                                 } // figure out proper aligment for this list
-                                Button{
+                                Button {
                                     id: removeButton
                                     text: "Remove"
                                     Layout.alignment: Qt.AlignRight
-                                    onClicked: dataModel.remove(index) // remove item from model
+                                    onClicked: dataModel.remove(
+                                                   index) // remove item from model
                                 }
                             }
                         }
@@ -250,21 +268,25 @@ Page {
             id: addDialog
             x: Math.round((root.width - width) / 2)
             y: (root.height - height) / 2 - header.height
-            width: units.gu(32)  //250
+            width: units.gu(32) //250
             height: units.gu(20) //500
             modal: true
             focus: true
             title: "Add new item"
             standardButtons: Dialog.Ok
             onAccepted: {
-                if (trainNumb.text !== "") { // if there is not text, ignore input
-                    dataModel.append({number: Number(trainNumb.text)})
+                if (trainNumb.text !== "") {
+                    // if there is not text, ignore input
+                    dataModel.append({
+                                         "number": Number(trainNumb.text)
+                                     })
                 }
-                trainNumb.text = "";
+                trainNumb.text = ""
                 manageDialog.close()
             }
             Component.onCompleted: {
-                addDialog.standardButton(Dialog.Ok).text = qsTrId("Add"); // rename dialog button
+                addDialog.standardButton(Dialog.Ok).text = qsTrId(
+                            "Add") // rename dialog button
             }
 
             contentItem: ColumnLayout {
@@ -279,19 +301,20 @@ Page {
             }
         }
 
-        Dialog { //confirm before deleting all dialog
+        Dialog {
+            //confirm before deleting all dialog
             id: confirmDialog
             x: Math.round((root.width - width) / 2)
             y: (root.height - height) / 2 - header.height
-            width: units.gu(32)  //250
+            width: units.gu(32) //250
             height: units.gu(20) //500
             modal: true
             focus: true
             title: "Confirm action"
             standardButtons: Dialog.Yes | Dialog.No
             onAccepted: {
-                dataModel.clear();
-                confirmDialog.close();
+                dataModel.clear()
+                confirmDialog.close()
             }
 
             contentItem: ColumnLayout {

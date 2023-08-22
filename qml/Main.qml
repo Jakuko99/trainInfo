@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright (C) 2023  Jakub Krsko
  *
@@ -13,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import QtQuick 2.9
 import QtQuick.Window 2.3
 import Ubuntu.Components 1.3 as Ubuntu
@@ -22,7 +23,6 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import Qt.labs.settings 1.0
 import io.thp.pyotherside 1.4
-
 
 ApplicationWindow {
     id: root
@@ -33,24 +33,24 @@ ApplicationWindow {
     height: units.gu(75)
     property real marginVal: units.gu(1)
 
-    function clearFields(){
-        nameLabel.text = "";
-        trainDestLabel.text = "";
-        positionLabel.text = "";
-        providerLabel.text = "";
+    function clearFields() {
+        nameLabel.text = ""
+        trainDestLabel.text = ""
+        positionLabel.text = ""
+        providerLabel.text = ""
     }
 
-    Settings{
+    Settings {
         id: mainPageSettings
         property string default_number
     }
 
-    Component.onCompleted: function(){
-        clearFields(); // remove placeholder text
-        Qt.application.name = "traininfo.jakub";
+    Component.onCompleted: function () {
+        clearFields() // remove placeholder text
+        Qt.application.name = "traininfo.jakub"
     }
 
-    StackView{
+    StackView {
         id: stack
         initialItem: mainPage
         anchors.fill: parent
@@ -58,13 +58,13 @@ ApplicationWindow {
 
     Page {
         id: mainPage
-        //anchors.fill: parent //maybe StackView sets fill for all pages
 
+        //anchors.fill: parent //maybe StackView sets fill for all pages
         header: ToolBar {
             id: toolbar
             RowLayout {
                 anchors.fill: parent
-                ToolButton{
+                ToolButton {
                     //text: qsTr("‹")
                     text: qsTr(" ") // invisible for now
                     //onClicked: stack.pop()
@@ -88,19 +88,23 @@ ApplicationWindow {
 
                         MenuItem {
                             text: "All trains"
-                            onTriggered: stack.push(Qt.resolvedUrl("allTrains.qml"))
+                            onTriggered: stack.push(Qt.resolvedUrl(
+                                                        "allTrains.qml"))
                         }
                         MenuItem {
                             text: "Favorite trains"
-                            onTriggered: stack.push(Qt.resolvedUrl("watchedTrains.qml"))
+                            onTriggered: stack.push(Qt.resolvedUrl(
+                                                        "watchedTrains.qml"))
                         }
                         MenuItem {
                             text: "Options"
-                            onTriggered: stack.push(Qt.resolvedUrl("optionsPage.qml"))
+                            onTriggered: stack.push(Qt.resolvedUrl(
+                                                        "optionsPage.qml"))
                         }
                         MenuItem {
                             text: "About"
-                            onTriggered: stack.push(Qt.resolvedUrl("aboutPage.qml"))
+                            onTriggered: stack.push(Qt.resolvedUrl(
+                                                        "aboutPage.qml"))
                         }
                     }
                 }
@@ -134,45 +138,59 @@ ApplicationWindow {
             Button {
                 id: button
                 text: qsTr("Search")
-                onClicked: function(){
-                    clearFields();
-                    numberField.text === "" ? numberField.text = numberField.placeholderText : undefined;
-                    mainPageSettings.default_number = numberField.text;
+                onClicked: function () {
+                    clearFields()
+                    numberField.text === "" ? numberField.text
+                                              = numberField.placeholderText : undefined
+                    mainPageSettings.default_number = numberField.text
 
                     nameLabel.text = "Fetching train info..." //show that something is happening
-                    python.call("example.getData", [numberField.text], function(returnVal) {
-                        const json_obj = JSON.parse(returnVal);
-                        //console.log(returnVal)
-                        if (json_obj["CisloVlaku"]){ // train found
-                            if (json_obj["NazovVlaku"]){
-                                nameLabel.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku + " " + json_obj.NazovVlaku;
-                            } else {
-                                nameLabel.text = json_obj.DruhVlakuKom.trim() + ' ' + json_obj.CisloVlaku;
-                            }
-                            trainDestLabel.text = json_obj.StanicaVychodzia + " (" + json_obj.CasVychodzia + ") -> " + json_obj.StanicaCielova + " (" + json_obj.CasCielova + ")";
-                            positionLabel.text = "Position: " + json_obj.StanicaUdalosti + " " + json_obj.CasUdalosti + " Delay: " + json_obj.Meskanie + " min";
-                            providerLabel.text = "Provider: " + json_obj.Dopravca;
-                            if (json_obj.Meskanie < 5){ // color code position based on delay
-                                positionLabel.color = "green";
-                            } else if ((json_obj.Meskanie >= 5) && (json_obj.Meskanie < 20)){
-                                positionLabel.color = "orange";
-                            } else {
-                                positionLabel.color = "red";
-                            }
-                        } else { // train not found
-                            nameLabel.text = "Train not found";
-                            trainDestLabel.text = "";
-                            positionLabel.text = "";
-                            providerLabel.text = "";
-                        }
-                    }
-                    );
+                    python.call("example.getData", [numberField.text],
+                                function (returnVal) {
+                                    const json_obj = JSON.parse(returnVal)
+                                    //console.log(returnVal)
+                                    if (json_obj["CisloVlaku"]) {
+                                        // train found
+                                        if (json_obj["NazovVlaku"]) {
+                                            nameLabel.text = json_obj.DruhVlakuKom.trim(
+                                                        ) + ' ' + json_obj.CisloVlaku
+                                                    + " " + json_obj.NazovVlaku
+                                        } else {
+                                            nameLabel.text = json_obj.DruhVlakuKom.trim(
+                                                        ) + ' ' + json_obj.CisloVlaku
+                                        }
+                                        trainDestLabel.text = json_obj.StanicaVychodzia
+                                                + " (" + json_obj.CasVychodzia
+                                                + ") -> " + json_obj.StanicaCielova
+                                                + " (" + json_obj.CasCielova + ")"
+                                        positionLabel.text = "Position: " + json_obj.StanicaUdalosti
+                                                + " " + json_obj.CasUdalosti + " Delay: "
+                                                + json_obj.Meskanie + " min"
+                                        providerLabel.text = "Provider: " + json_obj.Dopravca
+                                        if (json_obj.Meskanie < 5) {
+                                            // color code position based on delay
+                                            positionLabel.color = "green"
+                                        } else if ((json_obj.Meskanie >= 5)
+                                                   && (json_obj.Meskanie < 20)) {
+                                            positionLabel.color = "orange"
+                                        } else {
+                                            positionLabel.color = "red"
+                                        }
+                                    } else {
+                                        // train not found
+                                        nameLabel.text = "Train not found"
+                                        trainDestLabel.text = ""
+                                        positionLabel.text = ""
+                                        providerLabel.text = ""
+                                    }
+                                })
                 }
             }
         }
 
         Column {
             anchors.rightMargin: 0
+            id: trainColumn
             anchors.leftMargin: 0
             anchors.topMargin: marginVal
             anchors.top: inputRow.bottom
@@ -189,7 +207,6 @@ ApplicationWindow {
                 anchors.left: parent.left
                 text: qsTr("Train info placeholder")
                 font.bold: true
-
             }
 
             Label {
@@ -230,17 +247,15 @@ ApplicationWindow {
         }
     }
 
-
     Python {
         id: python
 
         Component.onCompleted: {
-            addImportPath(Qt.resolvedUrl('../src/'));
-            importModule('example', function() {
-            });
+            addImportPath(Qt.resolvedUrl('../src/'))
+            importModule('example', function () {})
         }
         onError: {
-            console.log('python error: ' + traceback);
+            console.log('python error: ' + traceback)
         }
     }
 }

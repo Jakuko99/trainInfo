@@ -30,13 +30,7 @@ def getData(number:int = None):
         for vlak in response_obj:
             if vlak.get("CisloVlaku") == number:
                 return json.dumps(vlak)
-        return '{"id":0}'
-        #for vlak in response_obj:
-          #  if vlak.get("CisloVlaku") == args.nr:
-            #    print(vlak.get('DruhVlaku').strip(), vlak.get('CisloVlaku'))
-             #   print(vlak.get('StanicaVychodzia'), "("+ vlak.get('CasVychodzia')+ ")", "->", vlak.get('StanicaCielova') , "(" + vlak.get('CasCielova') + ")")
-             #   print("Poloha:", vlak.get('StanicaUdalosti'), vlak.get('CasUdalosti') ,"Meskanie:", vlak.get('Meskanie'), "min")
-              #  print("Dopravca:", vlak.get('Dopravca'))        
+        return '{"id":0}'     
 
 def getAllData():
     request = Request("GET", "https://tis.zsr.sk/mapavlakov/api/osobne").prepare()
