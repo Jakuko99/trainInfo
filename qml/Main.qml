@@ -31,7 +31,9 @@ ApplicationWindow {
     //automaticOrientation: true
     width: units.gu(45)
     height: units.gu(75)
+
     property real marginVal: units.gu(1)
+    property string datastore: ""
 
     function clearFields() {
         nameLabel.text = ""
@@ -42,12 +44,33 @@ ApplicationWindow {
 
     Settings {
         id: mainPageSettings
+        category: "main_settings"
         property string default_number
+        property alias recent_trains: root.datastore
     }
 
     Component.onCompleted: function () {
         clearFields() // remove placeholder text
         Qt.application.name = "traininfo.jakub"
+        // load search history
+        if (datastore) {
+            trainHistoryModel.clear()
+            var datamodel = JSON.parse(datastore)
+            for (var i = 0; i < datamodel.length; ++i)
+                trainHistoryModel.append(datamodel[i])
+        }
+    }
+
+    function refreshModel() {
+        //save history to config file
+        var datamodel = []
+        for (var i = 0; i < trainHistoryModel.count; ++i)
+            datamodel.push(trainHistoryModel.get(i))
+        datastore = JSON.stringify(datamodel)
+    }
+
+    ListModel {
+        id: trainHistoryModel
     }
 
     StackView {
@@ -176,6 +199,11 @@ ApplicationWindow {
                                         } else {
                                             positionLabel.color = "red"
                                         }
+                                        trainHistoryModel.append({
+                                                                     "number": Number(json_obj.CisloVlaku),
+                                                                     "train_type": json_obj.DruhVlakuKom.trim()
+                                                                 })
+                                        root.refreshModel()
                                     } else {
                                         // train not found
                                         nameLabel.text = "Train not found"
@@ -243,6 +271,48 @@ ApplicationWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: marginVal
                 onClicked: clearFields()
+            }
+        }
+
+        ColumnLayout {
+            id: trainHistory
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: trainColumn.bottom
+            anchors.margins: marginVal
+
+            Label {
+                text: "Search history"
+                font.bold: true
+            }
+
+            ListView {
+                // fix items overlapping in place
+                id: entryHistoryList
+                Layout.fillWidth: true
+                model: trainHistoryModel
+                delegate: Item {
+                    id: historyItem
+                    width: parent.width
+                    height: historyRow.height
+                    RowLayout {
+                        id: historyRow
+                        Layout.fillWidth: true
+                        Label {
+                            text: train_type
+                        }
+
+                        Label {
+                            text: number
+                        }
+                    }
+                }
+            }
+
+            Button {
+                Layout.alignment: Qt.AlignRight
+                text: "Clear history"
+                onClicked: trainHistoryModel.clear()
             }
         }
     }
