@@ -1,6 +1,6 @@
 # Train info
 
-Simple app for getting train information from API provided by ŽSR (Railways of Slovak republic). Currently you can search a train by entering its number or get list of all trains and filter them by their type. Maybe in future I will add functionality for watching and reporting info about chosen trains via push notifications. App is written in QML and JavaScript, Python is used for handling calls to the API and sending data to the app.
+Simple app for getting train information from API provided by Railways of Slovak republic. Currently you can search a train by entering its number or get list of all trains and filter them by their type. Maybe in future I will add functionality for watching and reporting info about chosen trains via push notifications. App is written in QML and JavaScript, Python is used for handling calls to the API and sending data to the app.
 
 ## Launching the app
 If you don't have Clickable installed, install it via this [link](https://clickable-ut.dev/en/latest/install.html)
